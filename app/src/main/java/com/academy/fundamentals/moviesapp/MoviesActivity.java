@@ -19,6 +19,7 @@ import com.academy.fundamentals.moviesapp.Networking.DAO.Movie.MoviesListRespons
 import com.academy.fundamentals.moviesapp.Networking.RestClient;
 import com.academy.fundamentals.moviesapp.db.AppDatabase;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -53,6 +54,10 @@ public class MoviesActivity extends AppCompatActivity implements MyMoviesClickab
             case R.id.thread_handler_item: {
                 Intent intent = new Intent(this, ThreadHandlerActivity.class);
                 startActivity(intent);
+                break;
+            }
+            case R.id.delete_cache_item: {
+                saveData(new ArrayList<>());
                 break;
             }
         }

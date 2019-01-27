@@ -10,4 +10,7 @@
     <item
         android:id="@+id/thread_handler_item"
         android:title="@string/thread_handler_item" />
+    <item
+        android:id="@+id/delete_cache_item"
+        android:title="@string/delete_cache_button" />
 </menu>
