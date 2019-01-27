@@ -22,7 +22,7 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <ImageView
-                android:id="@+id/topImageView"
+                android:id="@+id/back_drop_image_view"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:src="@color/colorPrimaryDark" />
@@ -37,7 +37,7 @@
             app:layout_constraintTop_toBottomOf="@+id/top_section">
 
             <ImageView
-                android:id="@+id/centerImageView"
+                android:id="@+id/poster_image_view"
                 android:layout_width="150dp"
                 android:layout_height="match_parent"
                 android:src="@color/colorPrimary" />
@@ -60,10 +60,12 @@
                     android:text="@string/released_date" />
 
                 <Button
+                    android:id="@+id/trailer_button"
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
                     android:onClick="movieTrailerOnClick"
-                    android:text="@string/movie_trailer" />
+                    android:text="@string/movie_trailer"
+                    android:clickable="false"/>
             </LinearLayout>
 
         </LinearLayout>

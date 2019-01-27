@@ -1,8 +1,6 @@
 package com.academy.fundamentals.moviesapp;
 
 
-import android.content.Intent;
-import android.net.Uri;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -18,8 +16,8 @@ public class DetailsActivity extends FragmentActivity {
     int movieIndex;
     private ViewPager viewPager;
     private PagerAdapter pagerAdapter;
-    ScreenSlideMoviesFragment movieFragment;
-    ScreenSlideMoviesFragment currentFragment;
+    DetailsFragment movieFragment;
+    DetailsFragment currentFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,7 +37,7 @@ public class DetailsActivity extends FragmentActivity {
 
         @Override
         public void setPrimaryItem(ViewGroup container, int position, Object object) {
-            currentFragment = ((ScreenSlideMoviesFragment) object);
+            currentFragment = ((DetailsFragment) object);
             super.setPrimaryItem(container, position, object);
         }
 
@@ -47,9 +45,9 @@ public class DetailsActivity extends FragmentActivity {
         public Fragment getItem(int position) {
             Bundle bundle = new Bundle();
             bundle.putParcelable("movie", MoviesActivity.movies.get(position));
-            movieFragment = new ScreenSlideMoviesFragment();
+            movieFragment = new DetailsFragment();
             movieFragment.setArguments(bundle);
-            Log.d("Ron - ", MoviesActivity.movies.get(position).getName());
+            Log.d("Ron - ", MoviesActivity.movies.get(position).getTitle());
             return movieFragment;
         }
 
@@ -60,6 +58,6 @@ public class DetailsActivity extends FragmentActivity {
     }
 
     public void movieTrailerOnClick(View view) {
-        currentFragment.movieTrailerOnClick(view);
+        currentFragment.movieTrailerOnClick();
     }
 }

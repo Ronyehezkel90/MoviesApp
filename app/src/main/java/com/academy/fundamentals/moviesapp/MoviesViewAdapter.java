@@ -10,9 +10,12 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.academy.fundamentals.moviesapp.Networking.DAO.Movie.MovieItem;
 import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
+import java.util.List;
+
+import static com.academy.fundamentals.moviesapp.Constants.smallPosterSize;
 
 /**
  * Created by ron on 21/12/18.
@@ -21,10 +24,10 @@ import java.util.ArrayList;
 public class MoviesViewAdapter extends RecyclerView.Adapter<MoviesViewAdapter.ViewHolder> {
 
     private LayoutInflater inflater;
-    private ArrayList<MovieModel> dataSource;
+    private List<MovieItem> dataSource;
     private MyMoviesClickable myMoviesClickable;
 
-    public MoviesViewAdapter(Context context, ArrayList<MovieModel> items) {
+    public MoviesViewAdapter(Context context, List<MovieItem> items) {
         dataSource = items;
         inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         myMoviesClickable = (MoviesActivity) context;
@@ -60,10 +63,10 @@ public class MoviesViewAdapter extends RecyclerView.Adapter<MoviesViewAdapter.Vi
             this.view = view;
         }
 
-        public void onBindViewHolder(final int position, MovieModel movieModel) {
-            Picasso.get().load(movieModel.getImageResourceUrl()).into(imageRow);
-            titleRow.setText(movieModel.getName());
-            overviewRow.setText(movieModel.getOverview());
+        public void onBindViewHolder(final int position, MovieItem movieItem) {
+            Picasso.get().load(String.format(Constants.baseImageUrl, smallPosterSize, movieItem.getPosterPath())).into(imageRow);
+            titleRow.setText(movieItem.getTitle());
+            overviewRow.setText(movieItem.getOverview());
 
             view.setOnHoverListener(new View.OnHoverListener() {
                 @Override

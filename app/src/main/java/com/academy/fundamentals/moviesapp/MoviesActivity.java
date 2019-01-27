@@ -6,33 +6,36 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import com.academy.fundamentals.moviesapp.AsyncAndThreads.AsyncTaskActivity;
 import com.academy.fundamentals.moviesapp.AsyncAndThreads.ThreadHandlerActivity;
+import com.academy.fundamentals.moviesapp.Networking.DAO.Movie.MovieItem;
+import com.academy.fundamentals.moviesapp.Networking.DAO.Movie.MoviesListResponse;
+import com.academy.fundamentals.moviesapp.Networking.RestClient;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class MoviesActivity extends AppCompatActivity implements MyMoviesClickable {
     private RecyclerView recyclerView;
     private RecyclerView.Adapter adapter;
     private RecyclerView.LayoutManager layoutManager;
-    public static ArrayList<MovieModel> movies;
+    public static List<MovieItem> movies;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movies);
-        initMoviesList();
         initRecyclerView();
-        initItenTouchHelper();
+        loadMovies();
+        initItemTouchHelper();
     }
 
     @Override
@@ -58,7 +61,7 @@ public class MoviesActivity extends AppCompatActivity implements MyMoviesClickab
         return true;
     }
 
-    private void initItenTouchHelper() {
+    private void initItemTouchHelper() {
         ItemTouchHelper.Callback callback = new ItemTouchHelper.Callback() {
 
             public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
@@ -83,17 +86,24 @@ public class MoviesActivity extends AppCompatActivity implements MyMoviesClickab
         ith.attachToRecyclerView(recyclerView);
     }
 
-    private void initMoviesList() {
-        Constants cons = new Constants();
-        movies = new ArrayList<MovieModel>();
-        for (int movieIdx = 0; movieIdx < cons.moviesNames.length; movieIdx++) {
-            movies.add(new MovieModel(
-                    cons.moviesNames[movieIdx],
-                    cons.overviews[movieIdx],
-                    cons.moviesImages[movieIdx],
-                    cons.trailerUrls[movieIdx],
-                    cons.releaseDates[movieIdx]));
-        }
+    private void loadMovies() {
+        Call<MoviesListResponse> call = RestClient.moviesService.getPopularMovies();
+        call.enqueue(new Callback<MoviesListResponse>() {
+            @Override
+            public void onResponse(Call<MoviesListResponse> call, Response<MoviesListResponse> response) {
+                if (response.isSuccessful()) {
+                    movies = response.body().getResults();
+                    adapter = new MoviesViewAdapter(MoviesActivity.this, movies);
+                    recyclerView.setAdapter(adapter);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<MoviesListResponse> call, Throwable t) {
+                //todo: show an error to the user
+
+            }
+        });
     }
 
 
@@ -101,8 +111,6 @@ public class MoviesActivity extends AppCompatActivity implements MyMoviesClickab
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
-        adapter = new MoviesViewAdapter(this, movies);
-        recyclerView.setAdapter(adapter);
     }
 
     @Override
