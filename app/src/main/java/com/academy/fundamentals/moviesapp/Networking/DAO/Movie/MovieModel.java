@@ -1,5 +1,7 @@
 package com.academy.fundamentals.moviesapp.Networking.DAO.Movie;
 
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.PrimaryKey;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -7,13 +9,13 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
-public class MovieItem implements Parcelable {
+@Entity
+public class MovieModel implements Parcelable {
     private String overview;
     private String originalLanguage;
     private String originalTitle;
     private boolean video;
     private String title;
-    private List<Integer> genreIds;
     @SerializedName("poster_path")
     private String posterPath;
     @SerializedName("backdrop_path")
@@ -22,11 +24,16 @@ public class MovieItem implements Parcelable {
     private String releaseDate;
     private double voteAverage;
     private double popularity;
+    @PrimaryKey
     private int id;
     private boolean adult;
     private int voteCount;
 
-    protected MovieItem(Parcel in) {
+    public MovieModel() {
+
+    }
+
+    protected MovieModel(Parcel in) {
         overview = in.readString();
         originalLanguage = in.readString();
         originalTitle = in.readString();
@@ -64,15 +71,15 @@ public class MovieItem implements Parcelable {
         return 0;
     }
 
-    public static final Creator<MovieItem> CREATOR = new Creator<MovieItem>() {
+    public static final Creator<MovieModel> CREATOR = new Creator<MovieModel>() {
         @Override
-        public MovieItem createFromParcel(Parcel in) {
-            return new MovieItem(in);
+        public MovieModel createFromParcel(Parcel in) {
+            return new MovieModel(in);
         }
 
         @Override
-        public MovieItem[] newArray(int size) {
-            return new MovieItem[size];
+        public MovieModel[] newArray(int size) {
+            return new MovieModel[size];
         }
     };
 
@@ -114,14 +121,6 @@ public class MovieItem implements Parcelable {
 
     public String getTitle() {
         return title;
-    }
-
-    public void setGenreIds(List<Integer> genreIds) {
-        this.genreIds = genreIds;
-    }
-
-    public List<Integer> getGenreIds() {
-        return genreIds;
     }
 
     public void setPosterPath(String posterPath) {
@@ -191,13 +190,12 @@ public class MovieItem implements Parcelable {
     @Override
     public String toString() {
         return
-                "com.academy.fundamentals.moviesapp.DAO.MovieItem{" +
+                "com.academy.fundamentals.moviesapp.DAO.MovieModel{" +
                         "overview = '" + overview + '\'' +
                         ",original_language = '" + originalLanguage + '\'' +
                         ",original_title = '" + originalTitle + '\'' +
                         ",video = '" + video + '\'' +
                         ",title = '" + title + '\'' +
-                        ",genre_ids = '" + genreIds + '\'' +
                         ",poster_path = '" + posterPath + '\'' +
                         ",backdrop_path = '" + backdropPath + '\'' +
                         ",release_date = '" + releaseDate + '\'' +

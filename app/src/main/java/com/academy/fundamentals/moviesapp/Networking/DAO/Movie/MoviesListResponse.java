@@ -5,7 +5,7 @@ import java.util.List;
 public class MoviesListResponse {
     private int page;
     private int totalPages;
-    private List<MovieItem> results;
+    private List<MovieModel> results;
     private int totalResults;
 
     public void setPage(int page) {
@@ -24,11 +24,11 @@ public class MoviesListResponse {
         return totalPages;
     }
 
-    public void setResults(List<MovieItem> results) {
+    public void setResults(List<MovieModel> results) {
         this.results = results;
     }
 
-    public List<MovieItem> getResults() {
+    public List<MovieModel> getResults() {
         return results;
     }
 

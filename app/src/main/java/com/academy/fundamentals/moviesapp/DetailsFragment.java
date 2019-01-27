@@ -1,10 +1,12 @@
 package com.academy.fundamentals.moviesapp;
 
 
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,11 +14,14 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.academy.fundamentals.moviesapp.Networking.DAO.Movie.MovieItem;
-import com.academy.fundamentals.moviesapp.Networking.DAO.Video.VideoItem;
+import com.academy.fundamentals.moviesapp.Networking.DAO.Movie.MovieModel;
+import com.academy.fundamentals.moviesapp.Networking.DAO.Video.VideoModel;
 import com.academy.fundamentals.moviesapp.Networking.DAO.Video.VideosListResponse;
 import com.academy.fundamentals.moviesapp.Networking.RestClient;
+import com.academy.fundamentals.moviesapp.db.AppDatabase;
 import com.squareup.picasso.Picasso;
+
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -45,9 +50,10 @@ public class DetailsFragment extends Fragment {
     ImageView posterImageView;
 
 
-    MovieItem movieItem;
-    VideoItem videoItem;
+    MovieModel movieItem;
+    VideoModel videoItem;
     ViewGroup rootView;
+    Context context;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -55,8 +61,21 @@ public class DetailsFragment extends Fragment {
         this.movieItem = getArguments().getParcelable("movie");
         ButterKnife.bind(this, rootView);
         initView();
+        setContext();
         loadVideos();
         return rootView;
+    }
+
+    private void setContext() {
+        FragmentActivity activity = getActivity();
+        if (activity == null) {
+            return;
+        }
+        final Context context = activity.getApplicationContext();
+        if (context == null) {
+            return;
+        }
+        this.context = context;
     }
 
     private void initView() {
@@ -75,6 +94,7 @@ public class DetailsFragment extends Fragment {
     }
 
     private void loadVideos() {
+        restoreData();
         String movieId = String.valueOf(movieItem.getId());
         Call<VideosListResponse> call = RestClient.moviesService.getMovieVideos(movieId);
         final Button trailerButton = rootView.findViewById(R.id.trailer_button);
@@ -83,6 +103,8 @@ public class DetailsFragment extends Fragment {
             public void onResponse(Call<VideosListResponse> call, Response<VideosListResponse> response) {
                 if (response.isSuccessful()) {
                     videoItem = response.body().getResults().get(0);
+                    saveData(videoItem);
+                    //todo: solve it for load from cache as well.
                     trailerButton.setClickable(true);
                 }
             }
@@ -92,6 +114,23 @@ public class DetailsFragment extends Fragment {
                 trailerButton.setText("No Trailer");
             }
         });
+    }
+
+    private void saveData(VideoModel videoItem) {
+        VideoModel videoModel = new VideoModel();
+        videoModel.setMovieId(movieItem.getId());
+        videoModel.setId(videoItem.getId());
+        videoModel.setKey(videoItem.getKey());
+        AppDatabase.getInstance(context).videoDao().insert(videoModel);
+    }
+
+    private void restoreData() {
+        final VideoModel videoModel = AppDatabase.getInstance(context).videoDao().getVideo(movieItem.getId());
+        if (videoModel != null) {
+            videoItem = videoModel;
+            return;
+        }
+
     }
 
 }

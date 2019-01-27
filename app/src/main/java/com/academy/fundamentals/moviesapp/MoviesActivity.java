@@ -1,6 +1,8 @@
 package com.academy.fundamentals.moviesapp;
 
 
+import android.arch.persistence.room.Room;
+import android.arch.persistence.room.RoomDatabase;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -12,9 +14,10 @@ import android.view.MenuItem;
 
 import com.academy.fundamentals.moviesapp.AsyncAndThreads.AsyncTaskActivity;
 import com.academy.fundamentals.moviesapp.AsyncAndThreads.ThreadHandlerActivity;
-import com.academy.fundamentals.moviesapp.Networking.DAO.Movie.MovieItem;
+import com.academy.fundamentals.moviesapp.Networking.DAO.Movie.MovieModel;
 import com.academy.fundamentals.moviesapp.Networking.DAO.Movie.MoviesListResponse;
 import com.academy.fundamentals.moviesapp.Networking.RestClient;
+import com.academy.fundamentals.moviesapp.db.AppDatabase;
 
 import java.util.Collections;
 import java.util.List;
@@ -23,11 +26,12 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+
 public class MoviesActivity extends AppCompatActivity implements MyMoviesClickable {
     private RecyclerView recyclerView;
-    private RecyclerView.Adapter adapter;
+    private MoviesViewAdapter adapter;
     private RecyclerView.LayoutManager layoutManager;
-    public static List<MovieItem> movies;
+    public static List<MovieModel> movies;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,23 +91,38 @@ public class MoviesActivity extends AppCompatActivity implements MyMoviesClickab
     }
 
     private void loadMovies() {
+        restoreData();
         Call<MoviesListResponse> call = RestClient.moviesService.getPopularMovies();
         call.enqueue(new Callback<MoviesListResponse>() {
             @Override
             public void onResponse(Call<MoviesListResponse> call, Response<MoviesListResponse> response) {
                 if (response.isSuccessful()) {
                     movies = response.body().getResults();
-                    adapter = new MoviesViewAdapter(MoviesActivity.this, movies);
-                    recyclerView.setAdapter(adapter);
+                    adapter.setData(movies);
+                    saveData(movies);
                 }
             }
 
             @Override
             public void onFailure(Call<MoviesListResponse> call, Throwable t) {
                 //todo: show an error to the user
-
             }
         });
+
+    }
+
+    private void saveData(List<MovieModel> moviesList) {
+        AppDatabase db = AppDatabase.getInstance(this);
+        db.movieDao().deleteAll();
+        db.movieDao().insertAll(moviesList);
+    }
+
+    private void restoreData() {
+        AppDatabase db = AppDatabase.getInstance(this);
+        List<MovieModel> moviesList = db.movieDao().getAll();
+        if (moviesList != null && moviesList.size() > 0) {
+            adapter.setData(moviesList);
+        }
     }
 
 
@@ -111,6 +130,8 @@ public class MoviesActivity extends AppCompatActivity implements MyMoviesClickab
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
+        adapter = new MoviesViewAdapter(MoviesActivity.this);
+        recyclerView.setAdapter(adapter);
     }
 
     @Override

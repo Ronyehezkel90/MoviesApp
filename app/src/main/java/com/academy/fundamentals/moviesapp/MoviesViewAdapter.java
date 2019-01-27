@@ -10,9 +10,10 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.academy.fundamentals.moviesapp.Networking.DAO.Movie.MovieItem;
+import com.academy.fundamentals.moviesapp.Networking.DAO.Movie.MovieModel;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.academy.fundamentals.moviesapp.Constants.smallPosterSize;
@@ -24,11 +25,10 @@ import static com.academy.fundamentals.moviesapp.Constants.smallPosterSize;
 public class MoviesViewAdapter extends RecyclerView.Adapter<MoviesViewAdapter.ViewHolder> {
 
     private LayoutInflater inflater;
-    private List<MovieItem> dataSource;
+    private List<MovieModel> dataSource = new ArrayList<>();
     private MyMoviesClickable myMoviesClickable;
 
-    public MoviesViewAdapter(Context context, List<MovieItem> items) {
-        dataSource = items;
+    public MoviesViewAdapter(Context context) {
         inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         myMoviesClickable = (MoviesActivity) context;
     }
@@ -49,6 +49,13 @@ public class MoviesViewAdapter extends RecyclerView.Adapter<MoviesViewAdapter.Vi
         return dataSource.size();
     }
 
+    public void setData(List<MovieModel> items) {
+        dataSource.clear();
+        dataSource.addAll(items);
+        notifyDataSetChanged();
+    }
+
+
     public class ViewHolder extends RecyclerView.ViewHolder {
         public final ImageView imageRow;
         public final TextView titleRow;
@@ -63,7 +70,7 @@ public class MoviesViewAdapter extends RecyclerView.Adapter<MoviesViewAdapter.Vi
             this.view = view;
         }
 
-        public void onBindViewHolder(final int position, MovieItem movieItem) {
+        public void onBindViewHolder(final int position, MovieModel movieItem) {
             Picasso.get().load(String.format(Constants.baseImageUrl, smallPosterSize, movieItem.getPosterPath())).into(imageRow);
             titleRow.setText(movieItem.getTitle());
             overviewRow.setText(movieItem.getOverview());

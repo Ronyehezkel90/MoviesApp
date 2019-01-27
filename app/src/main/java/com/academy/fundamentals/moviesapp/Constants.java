@@ -10,4 +10,5 @@ public class Constants {
     public static final String smallPosterSize = "w200";
     public static final String bigPosterSize = "w200";
     public static final String backdropSize = "w400";
+
 }
